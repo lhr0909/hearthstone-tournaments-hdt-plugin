@@ -2,10 +2,16 @@
 using System.Windows.Controls;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using HearthstoneTournamentsHDTPlugin.Controls;
+using System.Windows;
+using Hearthstone_Deck_Tracker;
 using Hearthstone_Deck_Tracker.Plugins;
+using HearthstoneTournamentsHDTPlugin.Controls;
+using Hearthstone_Deck_Tracker.API;
+using Hearthstone_Deck_Tracker.Enums;
+using Core = Hearthstone_Deck_Tracker.API.Core;
 
 namespace HearthstoneTournamentsHDTPlugin
 {
@@ -13,9 +19,8 @@ namespace HearthstoneTournamentsHDTPlugin
     {
         public void OnLoad()
         {
+            SetUpBrowserWindowHooks();
             SetUpMenuItem();
-            MainWindow = new MainWindow();
-            return;
         }
 
         public void OnUnload()
@@ -33,6 +38,27 @@ namespace HearthstoneTournamentsHDTPlugin
             return;
         }
 
+        private void SetUpBrowserWindowHooks()
+        {
+            MainWindow = new MainWindow();
+            var webBrowser = MainWindow.HstWebBrowser;
+            
+            GameEvents.OnGameStart.Add(() =>
+            {
+                var opponentName = Core.Game.Opponent.Name;
+                var opponentClass = Core.Game.Opponent.Class;
+                try
+                {
+                    webBrowser.InvokeScript("alert", opponentClass);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                
+            });
+        }
+
         private void SetUpMenuItem()
         {
             MenuItem = new MenuItem { Header = "hearthstone-tournaments" };
@@ -40,7 +66,7 @@ namespace HearthstoneTournamentsHDTPlugin
             {
                 if (!MainWindow.IsLoaded)
                 {
-                    MainWindow = new MainWindow();
+                    SetUpBrowserWindowHooks();
                 }
                 MainWindow.Show();
             };
