@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Windows.Controls;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using HearthstoneReplays;
+using HearthstoneReplays.Parser;
 using Hearthstone_Deck_Tracker;
 using Hearthstone_Deck_Tracker.Plugins;
 using HearthstoneTournamentsHDTPlugin.Controls;
@@ -67,16 +70,19 @@ namespace HearthstoneTournamentsHDTPlugin
                         var playerName = Core.Game.Player.Name;
                         var opponentName = Core.Game.Opponent.Name;
                         var didPlayerWin = Core.Game.CurrentGameStats.Result == GameResult.Win;
-                        var replayXmlString = "<HSReplay>Stub</HSReplay>";
+                        IList<string> powerLog = Core.Game.PowerLog;
                         try
                         {
-                            webBrowser.InvokeScript("uploadReplay", playerName, opponentName, didPlayerWin, replayXmlString);
+                            var hsReplay = ReplayParser.FromString(powerLog);
+                            ReplaySerializer.Serialize(hsReplay, TempXmlPath);
+                            var replayXmlString = File.ReadAllText(TempXmlPath);
+                            File.Delete(TempXmlPath);
+                            webBrowser.InvokeScript("uploadReplay", playerName, opponentName, didPlayerWin, replayXmlString, null);
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show(ex.Message);
-                        }
-
+                            webBrowser.InvokeScript("uploadReplay", playerName, opponentName, didPlayerWin, null, powerLog);
+                        }                       
                     });
                 }
             };
@@ -99,9 +105,13 @@ namespace HearthstoneTournamentsHDTPlugin
         public string Description => "Play Automated Hearthstone Tournaments Online!";
         public string ButtonText => "Plugin Settings";
         public string Author => "Simon Liang";
-        public Version Version => new Version(0, 0, 0, 1);
+        public Version Version => new Version(0, 0, 1, 0);
         public MenuItem MenuItem { get; private set; }
 
         public MainWindow MainWindow { get; private set; }
+
+        private ReplayParser ReplayParser => new ReplayParser();
+
+        private string TempXmlPath => Path.GetTempPath() + "hearthstone-tournament-replay.xml";
     }
 }
