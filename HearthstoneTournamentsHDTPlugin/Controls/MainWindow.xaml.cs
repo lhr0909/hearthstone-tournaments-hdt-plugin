@@ -1,4 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Controls;
 using MahApps.Metro.Controls;
 
 namespace HearthstoneTournamentsHDTPlugin.Controls
@@ -15,7 +18,14 @@ namespace HearthstoneTournamentsHDTPlugin.Controls
             {
                 //Code that throws the exception
             }
-            HstWebBrowser.Source = new Uri("https://hs-tournament.herokuapp.com/");
+            HstWebBrowser.Source = new Uri("https://hs-tournament.herokuapp.com/plugin");
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            e.Cancel = true;
+            this.Hide();
         }
     }
 }

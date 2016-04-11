@@ -42,21 +42,44 @@ namespace HearthstoneTournamentsHDTPlugin
         {
             MainWindow = new MainWindow();
             var webBrowser = MainWindow.HstWebBrowser;
-            
-            GameEvents.OnGameStart.Add(() =>
+
+            webBrowser.LoadCompleted += (sender, args) =>
             {
-                var opponentName = Core.Game.Opponent.Name;
-                var opponentClass = Core.Game.Opponent.Class;
-                try
+                var path = webBrowser.Source.PathAndQuery;
+                if (path.Equals("/plugin"))
                 {
-                    webBrowser.InvokeScript("alert", opponentClass);
+                    GameEvents.OnGameStart.Add(() =>
+                    {
+                        try
+                        {
+                            var user = webBrowser.InvokeScript("getUser");
+                            var a = user;
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
+                        }
+
+                    });
+
+                    GameEvents.OnGameEnd.Add(() =>
+                    {
+                        var playerName = Core.Game.Player.Name;
+                        var opponentName = Core.Game.Opponent.Name;
+                        var didPlayerWin = Core.Game.CurrentGameStats.Result == GameResult.Win;
+                        var replayXmlString = "<HSReplay>Stub</HSReplay>";
+                        try
+                        {
+                            webBrowser.InvokeScript("uploadReplay", playerName, opponentName, didPlayerWin, replayXmlString);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
+                        }
+
+                    });
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-                
-            });
+            };
         }
 
         private void SetUpMenuItem()
