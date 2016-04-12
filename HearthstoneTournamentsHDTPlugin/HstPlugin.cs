@@ -78,7 +78,7 @@ namespace HearthstoneTournamentsHDTPlugin
         public string Description => "Play Automated Hearthstone Tournaments Online!";
         public string ButtonText => "Plugin Settings";
         public string Author => "Simon Liang";
-        public Version Version => new Version(0, 0, 1, 0);
+        public Version Version => new Version(0, 1, 0, 0);
         public MenuItem MenuItem { get; private set; }
 
         public MainWindow MainWindow { get; private set; }
