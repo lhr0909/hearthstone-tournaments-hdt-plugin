@@ -66,13 +66,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\HSReplay\csharp\HearthstoneReplays\HearthstoneReplays.csproj">
-      <Project>{47cd4647-790b-428d-b4e4-8b3267c63469}</Project>
-      <Name>HearthstoneReplays</Name>
-      <Private>True</Private>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

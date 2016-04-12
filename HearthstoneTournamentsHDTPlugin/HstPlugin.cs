@@ -1,15 +1,6 @@
 ﻿using System;
 using System.Windows.Controls;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using HearthstoneReplays;
-using HearthstoneReplays.Parser;
-using Hearthstone_Deck_Tracker;
 using Hearthstone_Deck_Tracker.Plugins;
 using HearthstoneTournamentsHDTPlugin.Controls;
 using Hearthstone_Deck_Tracker.API;
@@ -51,37 +42,19 @@ namespace HearthstoneTournamentsHDTPlugin
                 var path = webBrowser.Source.PathAndQuery;
                 if (path.Equals("/plugin"))
                 {
-                    GameEvents.OnGameStart.Add(() =>
-                    {
-                        try
-                        {
-                            var user = webBrowser.InvokeScript("getUser");
-                            var a = user;
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.Message);
-                        }
-
-                    });
-
                     GameEvents.OnGameEnd.Add(() =>
                     {
                         var playerName = Core.Game.Player.Name;
                         var opponentName = Core.Game.Opponent.Name;
                         var didPlayerWin = Core.Game.CurrentGameStats.Result == GameResult.Win;
-                        IList<string> powerLog = Core.Game.PowerLog;
+                        var powerLog = Core.Game.PowerLog;
                         try
                         {
-                            var hsReplay = ReplayParser.FromString(powerLog);
-                            ReplaySerializer.Serialize(hsReplay, TempXmlPath);
-                            var replayXmlString = File.ReadAllText(TempXmlPath);
-                            File.Delete(TempXmlPath);
-                            webBrowser.InvokeScript("uploadReplay", playerName, opponentName, didPlayerWin, replayXmlString, null);
+                            webBrowser.InvokeScript("uploadReplay", playerName, opponentName, didPlayerWin, string.Join("\n", powerLog));
                         }
                         catch (Exception ex)
                         {
-                            webBrowser.InvokeScript("uploadReplay", playerName, opponentName, didPlayerWin, null, powerLog);
+                            MessageBox.Show(ex.Message);
                         }                       
                     });
                 }
@@ -109,9 +82,5 @@ namespace HearthstoneTournamentsHDTPlugin
         public MenuItem MenuItem { get; private set; }
 
         public MainWindow MainWindow { get; private set; }
-
-        private ReplayParser ReplayParser => new ReplayParser();
-
-        private string TempXmlPath => Path.GetTempPath() + "hearthstone-tournament-replay.xml";
     }
 }
