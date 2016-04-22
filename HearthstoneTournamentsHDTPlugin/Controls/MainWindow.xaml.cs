@@ -18,7 +18,7 @@ namespace HearthstoneTournamentsHDTPlugin.Controls
             {
                 //Code that throws the exception
             }
-            HstWebBrowser.Source = new Uri("https://hs-tournament.herokuapp.com/plugin");
+            HstWebBrowser.Source = new Uri("https://www.tavern.gg/plugin");
         }
 
         protected override void OnClosing(CancelEventArgs e)
